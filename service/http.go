@@ -2,6 +2,7 @@ package service
 
 import (
 	"embed"
+	"fsManage/service/api"
 	"goutils/logger"
 	"io/fs"
 	"net/http"
@@ -46,9 +47,7 @@ func Start(port int, host string) {
 	mux := http.NewServeMux()
 	mux.Handle("/", assetHandler("/", assets, "ui"))
 
-	mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("test"))
-	})
+	mux.HandleFunc("/list", api.List)
 
 	var server = &http.Server{
 		Addr:         host + ":" + strconv.Itoa(port),
