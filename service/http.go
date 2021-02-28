@@ -3,6 +3,7 @@ package service
 import (
 	"embed"
 	"fsManage/service/api"
+	"fsManage/utils"
 	"goutils/logger"
 	"io/fs"
 	"net/http"
@@ -47,14 +48,17 @@ func Start(port int, host string) {
 	mux := http.NewServeMux()
 	mux.Handle("/", assetHandler("/", assets, "ui"))
 
-	mux.HandleFunc("/list", api.List)
+	mux.HandleFunc("/api/list", api.List)
+	mux.HandleFunc("/api/remove", api.Remove)
 
+	strPort := strconv.Itoa(port)
 	var server = &http.Server{
-		Addr:         host + ":" + strconv.Itoa(port),
+		Addr:         host + ":" + strPort,
 		WriteTimeout: time.Second * 60,
 		Handler:      mux,
 	}
-	logger.PrintInfof("http service at %s", server.Addr)
+	ip, _ := utils.GetExternalIP()
+	logger.PrintInfof("http service at:\n\t- Local: http://localhost:%d\n\t- Network: http://%s:%d", port, ip, port)
 	err := server.ListenAndServe()
 	if err != nil {
 		logger.PrintError(err)

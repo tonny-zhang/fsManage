@@ -1,6 +1,6 @@
 <template>
   <div>
-    <FileList :fileList="fileList" :nav="nav"></FileList>
+    <FileList></FileList>
   </div>
 </template>
 
@@ -10,17 +10,17 @@ export default {
   name: 'App',
   data() {
     return {
-        fileList: [{
-          name: "a.js",
-          size: "15M"
-        }],
-        nav: [{
-          name: "a",
-          href: "/?a",
-        }, {
-          name: "b",
-          href: "/?a/b",
-        }]
+        // fileList: [{
+        //   name: "a.js",
+        //   size: "15M"
+        // }],
+        // nav: [{
+        //   name: "a",
+        //   href: "/?a",
+        // }, {
+        //   name: "b",
+        //   href: "/?a/b",
+        // }]
     }
   },
   components: {
