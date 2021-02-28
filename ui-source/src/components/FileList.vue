@@ -2,13 +2,20 @@
     <div>
         <div>
             <label>当前位置：</label>
-            <ul class="nav">
-                <li v-for="(n, i) in nav" :key="i">
-                    <a :href=n.href>{{n.name}}</a>
-                    <span v-if="i < nav.length - 1">/</span>
-                </li>
-            </ul>
+            
             <el-tag v-if="nav.length == 0" size="mini" type="danger">目录不存在</el-tag>
+            <template v-else style="display:block">
+                <ul class="nav">
+                    <li v-for="(n, i) in nav" :key="i">
+                        <a :href=n.href>{{n.name}}</a>
+                        <span v-if="i < nav.length - 1">/</span>
+                    </li>
+                </ul>
+                <div style="margin-top: 5px">
+                    <el-button plain type="primary" size="mini" @click="uploadFile">上传文件</el-button>
+                    <el-button plain type="primary" size="mini" @click="createFolder">新建目录</el-button>
+                </div>
+            </template>
         </div>
         <el-table
             :data="filelist"
@@ -34,18 +41,7 @@
             width="50"
             label="操作">
                 <template #default="scope">
-                    <el-popconfirm
-                        confirmButtonText='确定'
-                        cancelButtonText='取消'
-                        icon="el-icon-info"
-                        iconColor="red"
-                        title="确定要删除此文件吗？"
-                        @confirm="handleDelete(scope.$index, scope.row)"
-                        >
-                        <template #reference>
-                            <el-button type="text" size="small">删除</el-button>
-                        </template>
-                    </el-popconfirm>
+                    <el-button type="text" size="small" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -67,17 +63,6 @@
                 </td>
             </tr>
         </table>
-        <el-dialog
-            title="提示"
-            v-model="dialogVisible"
-            >
-            <span>{{dialogValue}}</span>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-                </span>
-            </template>
-        </el-dialog>
     </div>
 </template>
 <script>
@@ -89,13 +74,17 @@ export default {
     name: "FileList",
     data() {
         return {
-            dialogVisible: false,
-            dialogValue: '',
             filelist: [],
             nav: [],
         }
     },
     methods: {
+        uploadFile() {
+            window.T = this
+            console.log(this)
+            this.$confirm('test')
+        },
+        createFolder() {},
         sortFile(a, b, col) {
             if (col == "name") {
                 return a[col].localeCompare(b[col])
@@ -104,20 +93,31 @@ export default {
             }
         },
         dialog(msg) {
-            this.dialogVisible = true;
-            this.dialogValue = msg;
+            this.$alert(msg, "提示", {
+                confirmButtonText: '确定',
+                type: 'warning'
+            });
         },
         handleDelete(index, row) {
             const _this = this;
-            console.log(index, row)
             if (!row.isDir) {
-                deleteFile(dirCurrent+'/'+row.name).then((result) => {
-                    if (result.code == 200) {
-                        _this.refresh(dirCurrent)
-                    } else {
-                        _this.dialog(result.msg)
-                    }
-                })
+                _this.$confirm("确定要删除此文件吗？", "提示", {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    deleteFile(dirCurrent+'/'+row.name).then((result) => {
+                        if (result.code == 200) {
+                            this.$message({
+                                type: 'success',
+                                message: '成功删除'
+                            });
+                            _this.refresh(dirCurrent)
+                        } else {
+                            _this.dialog(result.msg)
+                        }
+                    })
+                }).catch(() => {});
             } else {
                 _this.dialog("暂时不支持删除目录")
             }
