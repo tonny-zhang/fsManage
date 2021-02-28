@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// GetExternalIP 得到外部使用的IP
 func GetExternalIP() (net.IP, error) {
 	ifaces, err := net.Interfaces()
 	if err != nil {
