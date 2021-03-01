@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <FileList></FileList>
-  </div>
+  <FileList></FileList>
 </template>
 
 <script>

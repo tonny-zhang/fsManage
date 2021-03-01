@@ -24,6 +24,12 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 		dir = filepath.Join(dirCurrent, dir)
 	}
 
+	// check permission
+	if isLockCreateFolder && !isInLockDir(dir) {
+		network.JSON(w, 500, "No permission to create folder ["+dir+"]", nil)
+		return
+	}
+
 	e := os.MkdirAll(dir, 0755)
 	if nil == e {
 		network.JSON(w, 200, "success create ["+dir+"]", nil)

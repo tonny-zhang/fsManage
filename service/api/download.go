@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fsManage/utils"
 	"io"
 	"net/http"
 	"net/url"
@@ -12,7 +13,7 @@ import (
 
 // Download 下载指定文件
 func Download(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	utils.InitFormValue(r)
 	file := r.FormValue("file")
 	if "" != file {
 		file, _ = url.QueryUnescape(file)

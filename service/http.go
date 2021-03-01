@@ -52,6 +52,7 @@ func Start(port int, host string) {
 	mux.HandleFunc("/api/remove", api.Remove)
 	mux.HandleFunc("/api/download", api.Download)
 	mux.HandleFunc("/api/createfolder", api.CreateFolder)
+	mux.HandleFunc("/api/upload", api.Upload)
 
 	strPort := strconv.Itoa(port)
 	var server = &http.Server{

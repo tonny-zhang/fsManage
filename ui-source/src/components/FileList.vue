@@ -12,15 +12,9 @@
                     </li>
                 </ul>
                 <div style="margin-top: 5px">
-                    <el-upload
-                        class="upload-demo"
-                        action="https://jsonplaceholder.typicode.com/posts/"
-                        multiple
-                        :limit="3"
-                        >
-                        <el-button size="small" type="primary">点击上传</el-button>
-                    </el-upload>
-                    <el-button plain type="primary" size="mini" @click="handleUploadFile">上传文件</el-button>
+                    <upload :dir=dirCurrent :isShow=showUpload @close="handleCloseUpload" class="upload" @uploaded="refresh(dirCurrent)">
+                        <el-button plain size="mini" type="primary" @click="showUpload = true">上传文件</el-button>
+                    </upload>
                     <el-button plain type="primary" size="mini" @click="handleCreateFolder">新建目录</el-button>
                 </div>
             </template>
@@ -56,18 +50,23 @@
 </template>
 <script>
 import {PARAMS, getList, deleteFile, downloadFile, createFolder} from "../api"
-
+import upload from './upload'
 let dirCurrent;
 
 export default {
     name: "FileList",
     data() {
         return {
+            dirCurrent: '',
             filelist: [],
             nav: [],
+            showUpload: false,
         }
     },
     methods: {
+        handleCloseUpload() {
+            this.showUpload = false;
+        },
         handleUploadFile() {
             window.T = this
             this.$confirm('test')
@@ -77,6 +76,7 @@ export default {
             _this.$prompt("请输入要创建的目录名（支持/多级目录）", {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
+                customClass: 'dialogPrompt',
             }).then(({value}) => {
                 if (value) {
                     value = value.trim();
@@ -158,7 +158,6 @@ export default {
                             vv.path = path;
                         }
                     })
-                    console.log(v.data.list)
                     _this.filelist = v.data.list;
 
                     let param = '';
@@ -173,7 +172,8 @@ export default {
                     _this.nav = navList
 
                     dirCurrent = v.data.nav;
-                    console.log(_this)
+
+                    _this.dirCurrent = dirCurrent;
                 } else {
                     _this.filelist = []
                 }
@@ -188,6 +188,9 @@ export default {
         } else {
             this.refresh(PARAMS.dir)
         }
+    },
+    components: {
+        upload
     }
 }
 </script>
@@ -230,31 +233,15 @@ a, a:visited{
 .tb-icon.icon-folder{
     background-image: url(../assets/folder.svg);
 }
-
-
-td{
-    padding: 3px;
-}
-tr:nth-child(2n){
-    background-color: rgba(230, 230, 230, 0.4);
-    border-radius: 5px;
-}
-.type-file::before,
-.type-folder::before{
-    content: ' ';
-    background-position: 0;
-    background-repeat: no-repeat;
-    padding-right: 6px;
-    width: 20px;
-    height: 20px;
+.upload{
     display: inline-block;
-        vertical-align: middle;
-    
+    margin-right: 3px;
 }
-.type-file::before{
-background-image: url(../assets/file.svg);
-}
-.type-folder::before{
-    background-image: url(../assets/folder.svg);
+</style>
+<style>
+@media screen and (max-width: 600px) {
+    .dialogPrompt{
+        width: 280px !important;
+    }
 }
 </style>
