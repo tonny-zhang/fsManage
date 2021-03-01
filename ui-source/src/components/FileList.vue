@@ -12,6 +12,14 @@
                     </li>
                 </ul>
                 <div style="margin-top: 5px">
+                    <el-upload
+                        class="upload-demo"
+                        action="https://jsonplaceholder.typicode.com/posts/"
+                        multiple
+                        :limit="3"
+                        >
+                        <el-button size="small" type="primary">点击上传</el-button>
+                    </el-upload>
                     <el-button plain type="primary" size="mini" @click="handleUploadFile">上传文件</el-button>
                     <el-button plain type="primary" size="mini" @click="handleCreateFolder">新建目录</el-button>
                 </div>
