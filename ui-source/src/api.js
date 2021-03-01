@@ -47,11 +47,18 @@ export const deleteFile = function(e) {
         file: e
     })
 }
+
 const iframeForDownload = document.createElement('iframe');
 iframeForDownload.style.display = 'none';
 document.body.appendChild(iframeForDownload);
 
 export const downloadFile = function(e) {
     iframeForDownload.src = baseURL + '/api/download?file=' + e;
+}
+
+export const createFolder = function(e) {
+    return instance.post('/api/createfolder', {
+        dir: e
+    })
 }
 export const PARAMS = params;

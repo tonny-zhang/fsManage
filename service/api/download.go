@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -25,13 +24,17 @@ func Download(w http.ResponseWriter, r *http.Request) {
 	file = filepath.Clean(file)
 	f, e := os.Open(file)
 	if e != nil {
-		fmt.Println(file, e)
 		w.WriteHeader(404)
 		w.Write([]byte("404 not found"))
 		return
 	}
+	defer f.Close()
 
 	s, _ := f.Stat()
+	if s.IsDir() {
+		w.Write([]byte("[" + file + "] is folder"))
+		return
+	}
 	w.Header().Add("Content-Length", strconv.Itoa(int(s.Size())))
 	w.Header().Add("Content-Disposition", "attachment; filename=\""+filepath.Base(file)+"\";")
 	io.Copy(w, f)

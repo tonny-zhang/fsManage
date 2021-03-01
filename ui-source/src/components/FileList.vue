@@ -12,8 +12,8 @@
                     </li>
                 </ul>
                 <div style="margin-top: 5px">
-                    <el-button plain type="primary" size="mini" @click="uploadFile">上传文件</el-button>
-                    <el-button plain type="primary" size="mini" @click="createFolder">新建目录</el-button>
+                    <el-button plain type="primary" size="mini" @click="handleUploadFile">上传文件</el-button>
+                    <el-button plain type="primary" size="mini" @click="handleCreateFolder">新建目录</el-button>
                 </div>
             </template>
         </div>
@@ -47,7 +47,7 @@
     </div>
 </template>
 <script>
-import {PARAMS, getList, deleteFile, downloadFile} from "../api"
+import {PARAMS, getList, deleteFile, downloadFile, createFolder} from "../api"
 
 let dirCurrent;
 
@@ -60,12 +60,42 @@ export default {
         }
     },
     methods: {
-        uploadFile() {
+        handleUploadFile() {
             window.T = this
-            console.log(this)
             this.$confirm('test')
         },
-        createFolder() {},
+        handleCreateFolder() {
+            const _this = this;
+            _this.$prompt("请输入要创建的目录名（支持/多级目录）", {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+            }).then(({value}) => {
+                if (value) {
+                    value = value.trim();
+                    if (value) {
+                        if (value[0] != '/') {
+                            value = dirCurrent + '/' + value;
+                        }
+                        createFolder(value).then(v => {
+                            if (v.code == 200) {
+                                _this.$message({
+                                    type: 'success',
+                                    message: v.msg
+                                });
+                                _this.refresh(dirCurrent)
+                            } else {
+                                _this.$message({
+                                    type: 'error',
+                                    message: v.msg,
+                                });
+                            }
+                        })
+                        return;
+                    }
+                }
+                _this.dialog('请输入正确的目录');
+            }).catch(() => {});
+        },
         sortFile(a, b, col) {
             if (col == "name") {
                 return a[col].localeCompare(b[col])
@@ -89,7 +119,7 @@ export default {
                 }).then(() => {
                     deleteFile(dirCurrent+'/'+row.name).then((result) => {
                         if (result.code == 200) {
-                            this.$message({
+                            _this.$message({
                                 type: 'success',
                                 message: '成功删除'
                             });
