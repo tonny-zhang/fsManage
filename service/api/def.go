@@ -30,5 +30,5 @@ func init() {
 
 // 是否在锁定的目录下
 func isInLockDir(dir string) bool {
-	return strings.HasPrefix(dir, dirCurrent+"/")
+	return dir == dirCurrent || strings.HasPrefix(dir, dirCurrent+"/")
 }

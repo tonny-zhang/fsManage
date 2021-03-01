@@ -176,6 +176,10 @@ export default {
                     _this.dirCurrent = dirCurrent;
                 } else {
                     _this.filelist = []
+                    _this.$message({
+                        type: 'error',
+                        message: v.msg,
+                    });
                 }
             }).catch(() => {
                 _this.fileList = []

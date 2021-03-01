@@ -62,6 +62,6 @@ func List(w http.ResponseWriter, r *http.Request) {
 		data.List = flist
 		network.JSON(w, 200, "success["+dir+"]", data)
 	} else {
-		network.JSON(w, 500, "error", e.Error())
+		network.JSON(w, 500, e.Error(), nil)
 	}
 }
