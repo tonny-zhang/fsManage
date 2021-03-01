@@ -21,6 +21,9 @@ func GetExternalIP() (net.IP, error) {
 		if iface.Flags&net.FlagLoopback != 0 {
 			continue // loopback interface
 		}
+		if iface.Flags&net.FlagBroadcast == 0 {
+			continue
+		}
 		addrs, err := iface.Addrs()
 		if err != nil {
 			return nil, err
