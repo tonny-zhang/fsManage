@@ -5,15 +5,17 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 )
 
 // FileList 文件信息
 type FileList struct {
-	Name  string `json:"name"`
-	IsDir bool   `json:"isDir"`
-	Size  int64  `json:"size"`
+	Name   string `json:"name"`
+	IsDir  bool   `json:"isDir"`
+	IsLink bool   `json:"isLink"`
+	Size   int64  `json:"size"`
 }
 
 // ListDataRes res data for List
@@ -44,11 +46,17 @@ func List(w http.ResponseWriter, r *http.Request) {
 		var data ListDataRes
 		var flist = make([]FileList, 0)
 		for _, f := range list {
-			flist = append(flist, FileList{
+			s, _ := os.Stat(filepath.Join(dir, f.Name()))
+			info := FileList{
 				Name:  f.Name(),
-				IsDir: f.IsDir(),
+				IsDir: s.IsDir(),
 				Size:  f.Size(),
-			})
+			}
+
+			if !f.IsDir() && info.IsDir {
+				info.IsLink = true
+			}
+			flist = append(flist, info)
 		}
 		data.Nav = dir
 		data.List = flist
