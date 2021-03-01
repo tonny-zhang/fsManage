@@ -26,9 +26,8 @@
             label="文件名"
             sortable>
             <template #default="scope">
-                <i :class="['tb-icon', scope.row.isDir?'icon-folder':'icon-file']"></i>
-                <a v-if=scope.row.isDir :href=scope.row.href>{{scope.row.name}}</a>
-                <span v-else>{{scope.row.name}}</span>
+                <a v-if=scope.row.isDir :href=scope.row.href><i class="tb-icon icon-folder"></i>{{scope.row.name}}</a>
+                <span v-else @click="download(scope.row.path)"><i class="tb-icon icon-file"></i>{{scope.row.name}}</span>
             </template>
             </el-table-column>
             <el-table-column
@@ -45,28 +44,10 @@
                 </template>
             </el-table-column>
         </el-table>
-        <table v-show="false" class="filelist">
-            <tr>
-                <th width="60%">文件名</th>
-                <th width="20%">文件大小</th>
-                <th>操作</th>
-            </tr>
-            <tr v-for="file in filelist" :key="file">
-                <td :class="'type-'+(file.isDir?'folder':'file')">
-                    <a v-if=file.isDir :href=file.href>{{file.name}}</a>
-                    <span v-else>{{file.name}}</span>
-                </td>
-                <td>{{file.size}}</td>
-                <td>
-                    <button v-if=file.isDir>打包下载</button>
-                    <button v-else>下载</button>
-                </td>
-            </tr>
-        </table>
     </div>
 </template>
 <script>
-import {PARAMS, getList, deleteFile} from "../api"
+import {PARAMS, getList, deleteFile, downloadFile} from "../api"
 
 let dirCurrent;
 
@@ -122,19 +103,25 @@ export default {
                 _this.dialog("暂时不支持删除目录")
             }
         },
+        download(e) {
+            downloadFile(e)
+        },
         refresh(dir) {
             const _this = this;
-            getList(dir).then(v => {console.log(v)
+            getList(dir).then(v => {
                 if (v.code == 200) {
                     let nav = v.data.nav;
-                    let list = [];
                     v.data.list.forEach(vv => {
                         if (vv.isDir) {
                             vv.href = './?dir='+nav+'/'+vv.name
+                        } else {
+                            let path = nav+'/'+vv.name;
+                            vv.href = './?file='+path;
+                            vv.path = path;
                         }
-                        list.push(vv);
                     })
-                    _this.filelist = list
+                    console.log(v.data.list)
+                    _this.filelist = v.data.list;
 
                     let param = '';
                     let navList = [];
@@ -158,7 +145,11 @@ export default {
         }
     },
     mounted: function() {
-        this.refresh(PARAMS.dir)
+        if (PARAMS.file) {
+            downloadFile(PARAMS.file)
+        } else {
+            this.refresh(PARAMS.dir)
+        }
     }
 }
 </script>
