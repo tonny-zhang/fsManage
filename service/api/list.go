@@ -46,7 +46,11 @@ func List(w http.ResponseWriter, r *http.Request) {
 		var data ListDataRes
 		var flist = make([]FileList, 0)
 		for _, f := range list {
-			s, _ := os.Stat(filepath.Join(dir, f.Name()))
+			s, e := os.Stat(filepath.Join(dir, f.Name()))
+			// 可能软链接失效
+			if e != nil {
+				continue
+			}
 			info := FileList{
 				Name:  f.Name(),
 				IsDir: s.IsDir(),

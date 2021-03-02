@@ -26,7 +26,7 @@ func Download(w http.ResponseWriter, r *http.Request) {
 	f, e := os.Open(file)
 	if e != nil {
 		w.WriteHeader(404)
-		w.Write([]byte("404 not found"))
+		w.Write([]byte(e.Error()))
 		return
 	}
 	defer f.Close()
