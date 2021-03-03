@@ -28,8 +28,25 @@
             label="文件名"
             sortable>
             <template #default="scope">
-                <a v-if=scope.row.isDir :href=scope.row.href><i class="tb-icon icon-folder"></i>{{scope.row.name}}</a>
-                <span v-else @click="download(scope.row.path)"><i class="tb-icon icon-file"></i>{{scope.row.name}}</span>
+                <a v-if=scope.row.isDir :href=scope.row.href>
+                    <i class="tb-icon icon-folder"></i>
+                    {{scope.row.name}}
+                </a>
+                <span v-else @click.self="download(scope.row.path)">
+                    <template v-if=scope.row.isImg>
+                        <el-popover
+                            placement="top-start"
+                            trigger="click"
+                        >
+                            <img @click.self="handleDetailImg" :src=scope.row.img class="popover-img"/>
+                            <template #reference>
+                                <i class="tb-icon icon-img" :style="{backgroundImage: 'url('+scope.row.img+')'}"></i>
+                            </template>
+                        </el-popover>
+                    </template>
+                    <i v-else class="tb-icon icon-file"></i>
+                    {{scope.row.name}}
+                </span>
             </template>
             </el-table-column>
             <el-table-column
@@ -49,10 +66,28 @@
     </div>
 </template>
 <script>
-import {PARAMS, getList, deleteFile, downloadFile, createFolder} from "../api"
+import {PARAMS, DETAIL_URL, getList, deleteFile, downloadFile, createFolder} from "../api"
 import upload from './upload'
 let dirCurrent;
 
+function getNum(num) {
+    return parseInt(num * 10) / 10;
+}
+function getSizeStr(size) {
+    if (size < 1024) {
+        return size + ' B'
+    }
+    size /= 1024;
+    if (size < 1024) {
+        return getNum(size) + ' K'
+    }
+    size /= 1024;
+    if (size < 1024) {
+        return getNum(size) + ' M'
+    }
+    size /= 1024;
+    return getNum(size) + ' G'
+}
 export default {
     name: "FileList",
     data() {
@@ -64,6 +99,9 @@ export default {
         }
     },
     methods: {
+        handleDetailImg(e) {
+            location.href = e.target.src;
+        },
         handleCloseUpload() {
             this.showUpload = false;
         },
@@ -156,8 +194,13 @@ export default {
                             let path = nav+'/'+vv.name;
                             vv.href = './?file='+path;
                             vv.path = path;
+
+                            if (vv.isImg) {
+                                vv.img = DETAIL_URL + '?f='+path
+                            }
                         }
-                    })
+                        vv.size = getSizeStr(vv.size);
+                    });
                     _this.filelist = v.data.list;
 
                     let param = '';
@@ -240,6 +283,15 @@ a, a:visited{
 .upload{
     display: inline-block;
     margin-right: 3px;
+}
+.icon-img{
+    background-size: contain;
+    border: 1px solid rgba(240, 240, 240, 1);
+    border-radius: 3px;
+}
+.popover-img{
+    max-width: 100%;
+    max-height: 100%;
 }
 </style>
 <style>

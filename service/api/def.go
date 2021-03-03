@@ -26,9 +26,15 @@ func init() {
 		var filep, _ = filepath.Abs(os.Args[0])
 		dirCurrent = path.Dir(filep)
 	}
+
+	filepath.Clean(dirCurrent)
+
+	if !strings.HasSuffix(dirCurrent, "/") {
+		dirCurrent += "/"
+	}
 }
 
 // 是否在锁定的目录下
 func isInLockDir(dir string) bool {
-	return dir == dirCurrent || strings.HasPrefix(dir, dirCurrent+"/")
+	return dir == dirCurrent || strings.HasPrefix(dir, dirCurrent)
 }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 //axios 相关配置，注意：axios请求头的 Content-Type 默认是 application/json，而postman默认的是 application/x-www-form-urlencoded
-const baseURL = process.env.NODE_ENV == "development"?'//'+location.hostname+':4000': '';
+const baseURL = process.env.NODE_ENV == "development"?location.protocol+'//'+location.hostname+':4000': '';
 var instance = axios.create({
     //请求根目录
 	baseURL,  
@@ -63,3 +63,4 @@ export const createFolder = function(e) {
 }
 export const PARAMS = params;
 export const UPLOAD_URL = baseURL + '/api/upload';
+export const DETAIL_URL = baseURL + '/api/detail'

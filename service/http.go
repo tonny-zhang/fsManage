@@ -51,6 +51,7 @@ func Start(port int, host string) {
 	mux.HandleFunc("/api/list", api.List)
 	mux.HandleFunc("/api/remove", api.Remove)
 	mux.HandleFunc("/api/download", api.Download)
+	mux.HandleFunc("/api/detail", api.FillDetail)
 	mux.HandleFunc("/api/createfolder", api.CreateFolder)
 	mux.HandleFunc("/api/upload", api.Upload)
 

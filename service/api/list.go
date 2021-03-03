@@ -8,14 +8,17 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/h2non/filetype"
 )
 
 // FileList 文件信息
 type FileList struct {
-	Name   string `json:"name"`
-	IsDir  bool   `json:"isDir"`
-	IsLink bool   `json:"isLink"`
-	Size   int64  `json:"size"`
+	Name    string `json:"name"`
+	IsDir   bool   `json:"isDir"`
+	IsLink  bool   `json:"isLink"`
+	Size    int64  `json:"size"`
+	IsImage bool   `json:"isImg"`
 }
 
 // ListDataRes res data for List
@@ -46,7 +49,8 @@ func List(w http.ResponseWriter, r *http.Request) {
 		var data ListDataRes
 		var flist = make([]FileList, 0)
 		for _, f := range list {
-			s, e := os.Stat(filepath.Join(dir, f.Name()))
+			fPath := filepath.Join(dir, f.Name())
+			s, e := os.Stat(fPath)
 			// 可能软链接失效
 			if e != nil {
 				continue
@@ -59,6 +63,15 @@ func List(w http.ResponseWriter, r *http.Request) {
 
 			if !f.IsDir() && info.IsDir {
 				info.IsLink = true
+			}
+
+			if !info.IsDir {
+				f, _ := os.Open(fPath)
+				var buf = make([]byte, 20)
+				f.Read(buf)
+				if filetype.IsImage(buf) {
+					info.IsImage = true
+				}
 			}
 			flist = append(flist, info)
 		}

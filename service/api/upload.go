@@ -38,6 +38,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if isLockUpload && !isInLockDir(dir) {
+		fmt.Println(dir, dirCurrent)
 		network.JSON(w, 500, "No permission to upload to ["+dir+"]", nil)
 		return
 	}
