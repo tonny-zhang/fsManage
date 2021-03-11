@@ -6,3 +6,6 @@
 
 ## 编译
 * 从源码编译 `go build -ldflags "-s -w" -o fsm`
+
+## 依赖包处理
+应用里使用了自身维护的一个工具包`goutils`, 这个可以在`go.mod`里查看，也可以把 [goutils](https://github.com/tonny-zhang/goutils)源码下载到和项目同级目录下即可。
